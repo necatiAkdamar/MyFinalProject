@@ -5,7 +5,7 @@ using System.Text;
 
 namespace DataAccess.Abstract
 {
-    public interface IProductDal:IEntityRepository<Product>//Data erişimi ve kullanımı için gerçekleştirilen operasyonlar tanımlanıyor
+    public interface ICategoryDal:IEntityRepository<Category>
     {
         
     }

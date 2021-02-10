@@ -8,9 +8,9 @@ using System.Text;
 
 namespace Core.DataAccess.EntityFramework
 {
-    public class EfEntityRepositoryBase<TEntity,TContext>:IEntityRepository<TEntity>
-        where TEntity: class, IEntity, new() //referans tip olacak, Ientity veritabanı nesnesi olacak, newlenmeyecek
-        where TContext: DbContext,new() //TContext dbcontext olacak. burada Genericler için kurallar tanımlıyoruz
+    public class EfEntityRepositoryBase<TEntity, TContext> : IEntityRepository<TEntity>
+        where TEntity : class, IEntity, new() //referans tip olacak, Ientity veritabanı nesnesi olacak, newlenmeyecek
+        where TContext : DbContext, new() //TContext dbcontext olacak. burada Genericler için kurallar tanımlıyoruz
     {
         public void Add(TEntity entity)
         {

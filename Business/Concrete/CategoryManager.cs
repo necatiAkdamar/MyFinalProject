@@ -22,6 +22,7 @@ namespace Business.Concrete
             return _categoryDal.GetAll();
         }
 
+        //Select * from Categories where CategoryId=3 şeklined bir sorgu çalıştırır.
         public Category GetById(int categoryId)
         {
             return _categoryDal.Get(c => c.CategoryId == categoryId);

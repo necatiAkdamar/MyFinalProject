@@ -29,10 +29,10 @@ namespace WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //Autofac,Ninjet,CastleWindsor,StructureMap,LightInject,DryInject
+            //Autofac,Ninjet,CastleWindsor,StructureMap,LightInject,DryInject-->IOC
             services.AddControllers();
-            services.AddSingleton<IProductService, ProductManager>();//Arkaplanda IProductService gördüðü yerde ProductManager new liyor.
-            services.AddSingleton<IProductDal, EfProductDal>();//Birisi IProductDal isterse ona EfProductDal new le ver.
+            //services.AddSingleton<IProductService, ProductManager>();//Arkaplanda IProductService gördüðü yerde ProductManager new liyor.
+            //services.AddSingleton<IProductDal, EfProductDal>();//Birisi IProductDal isterse ona EfProductDal new le ver.
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

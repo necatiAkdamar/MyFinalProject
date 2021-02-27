@@ -52,5 +52,16 @@ namespace WebAPI.Controllers
             }
             return BadRequest(result);
         }
+
+        [HttpGet("GetByCategoryId")]
+        public IActionResult GetByCategoryId(int id)//id ye göre veri istiyoruz.//Takma isim verdikten sonra GetById diye kullanabiliyoruz.
+        {
+            var result = _productService.GetAllByCategoryId(id);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
     }
 }

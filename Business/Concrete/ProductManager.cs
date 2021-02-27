@@ -1,4 +1,5 @@
 ﻿using Business.Abstract;
+using Business.BusinessAspect.Autofac;
 using Business.CCS;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
@@ -28,11 +29,10 @@ namespace Business.Concrete
             _categoryService = categoryService;
         }
 
-
-        [ValidationAspect(typeof(ProductValidator))]//Add methodunu ProductValidator daki kurallara göre doğruluyoruz.Bu bir attribute
+        [SecuredOperation("product.add,admin")]
+        [ValidationAspect(typeof(ProductValidator))]//Add methodunu ProductValidator daki kurallara göre doğrulama yapıyoruz.
         public IResult Add(Product product)
         {
-
             IResult result = BusinessRules.Run(CheckIfProductNameExists(product.ProductName),//iş kurallarını kontol edip sonucu result a atıyoruz.
                 CheckIfProductCountOfCategoryCorrect(product.CategoryID), 
                 CheckCategoryCount());
@@ -83,10 +83,14 @@ namespace Business.Concrete
         [ValidationAspect(typeof(ProductValidator))]
         public IResult Update(Product product)
         {
-            throw new NotImplementedException();
+            _productDal.Update(product);
+            return new SuccessResult(Messages.ProductUpdated);
         }
 
-        private IResult CheckIfProductCountOfCategoryCorrect(int categoryId)//İş kuralı ekliyoruz. Herbir kategori için 10 ürün olması için.
+
+
+        //İş Kuralları
+        private IResult CheckIfProductCountOfCategoryCorrect(int categoryId)//İş kuralı ekliyoruz. Herbir kategori için ürün sayısı 10 geçemez.
         {
             var result = _productDal.GetAll(p => p.CategoryID == categoryId).Count;
             if (result >= 10)

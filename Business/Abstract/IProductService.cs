@@ -18,5 +18,7 @@ namespace Business.Abstract
         IResult Add(Product product);
 
         IResult Update(Product product);
+
+        IResult AddTransactionalTest(Product product);//Uygulamalarda tutarlılığı korumak için kullanılan interface
     }
 }

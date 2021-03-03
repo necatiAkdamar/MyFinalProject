@@ -3,6 +3,8 @@ using Business.BusinessAspect.Autofac;
 using Business.CCS;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Caching;
+using Core.Aspects.Autofac.Transaction;
 using Core.Aspects.Autofac.Validation;
 using Core.CrossCuttingConcerns.Validation;
 using Core.Utilities.Business;
@@ -29,8 +31,9 @@ namespace Business.Concrete
             _categoryService = categoryService;
         }
 
-        [SecuredOperation("product.add,admin")]
+        [SecuredOperation("product.add,admin")]//product.add ve admin yetkisi olanlar Add işlemi yapabilecek
         [ValidationAspect(typeof(ProductValidator))]//Add methodunu ProductValidator daki kurallara göre doğrulama yapıyoruz.
+        [CacheRemoveAspect("IProductService.Get")]
         public IResult Add(Product product)
         {
             IResult result = BusinessRules.Run(CheckIfProductNameExists(product.ProductName),//iş kurallarını kontol edip sonucu result a atıyoruz.
@@ -46,6 +49,8 @@ namespace Business.Concrete
             return new SuccessResult(Messages.ProductAdded);
         }
 
+
+        [CacheAspect]//aşağıda çağrılacak kodlarda veri değişiklikleri yoksa ilk çalışmasını cache leyip daha sonra isteklere hep onu gönderir.
         public IDataResult<List<Product>> GetAll()
         {
             if (DateTime.Now.Hour == 01)
@@ -61,6 +66,8 @@ namespace Business.Concrete
             return new SuccessDataResult<List<Product>>(_productDal.GetAll(p => p.CategoryID == id));
         }
 
+
+        [CacheAspect]//Manipülasyon yapan yani veri değişimleri, güncelleme gibi methodları cacheaspect ile yönetiyoruz
         public IDataResult<Product> GetById(int productId)
         {
             return new SuccessDataResult<Product>(_productDal.Get(p => p.ProductID == productId));
@@ -81,6 +88,7 @@ namespace Business.Concrete
         }
 
         [ValidationAspect(typeof(ProductValidator))]
+        [CacheRemoveAspect("IProductService.Get")]//IproductService de bütün getleri güncelleme success olduğu zaman cache den siler
         public IResult Update(Product product)
         {
             _productDal.Update(product);
@@ -93,7 +101,7 @@ namespace Business.Concrete
         private IResult CheckIfProductCountOfCategoryCorrect(int categoryId)//İş kuralı ekliyoruz. Herbir kategori için ürün sayısı 10 geçemez.
         {
             var result = _productDal.GetAll(p => p.CategoryID == categoryId).Count;
-            if (result >= 10)
+            if (result >= 15)
             {
                 return new ErrorResult(Messages.ProductCountOfCategoryError);
             }
@@ -110,14 +118,20 @@ namespace Business.Concrete
             return new SuccessResult();
         }
 
-        private IResult CheckCategoryCount()//İş kuralı ekliyoruz. Kategori sayısı 15 geçtiğinde yeni ürün eklenemez
+        private IResult CheckCategoryCount()//İş kuralı ekliyoruz. Kategori sayısı 25 geçtiğinde yeni ürün eklenemez
         {
             var result = _categoryService.GetAll();//Any parantez içerisindeki şarta uyan data varmı yokmu true-false döndürür.
-            if (result.Data.Count>15)
+            if (result.Data.Count>25)
             {
                 return new ErrorResult(Messages.CategoryLimitExceded);
             }
             return new SuccessResult();
+        }
+
+        [TransactionScopeAspect]
+        public IResult AddTransactionalTest(Product product)
+        {
+            throw new NotImplementedException();
         }
     }
 }
